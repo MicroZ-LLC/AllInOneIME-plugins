@@ -1,0 +1,4 @@
+.DS_Store
+# Never commit a signing key: it lives in the maintainer's login keychain.
+*.key
+*.pem
