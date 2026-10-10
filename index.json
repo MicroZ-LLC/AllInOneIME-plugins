@@ -1,0 +1,29 @@
+{
+  "generated" : "2026-10-10T22:29:01Z",
+  "plugins" : [
+    {
+      "api" : 1,
+      "author" : "weijianz-opc",
+      "base" : "plugins/stock/1.0.0/",
+      "color" : "green",
+      "files" : {
+        "main.js" : "d0ba87ab480502ee30b01b9e8a8caa0f322533e2c9ecaa54cc809bf192c27751",
+        "plugin.json" : "90b371b6401f881c85c1390d33c25ca966563f006463bae46f9bc51a229bfdb3"
+      },
+      "homepage" : "https://github.com/weijianz-opc/AllInOneIME-plugins",
+      "hosts" : [
+        "query1.finance.yahoo.com"
+      ],
+      "icon" : "chart.line.uptrend.xyaxis",
+      "minAppVersion" : "0.2.0",
+      "name" : "stock",
+      "summary" : {
+        "en" : "Stock quotes: @stock AAPL 600519 700",
+        "zh" : "股票行情：@stock AAPL 600519 700"
+      },
+      "type" : "script",
+      "version" : "1.0.0"
+    }
+  ],
+  "schema" : 1
+}
