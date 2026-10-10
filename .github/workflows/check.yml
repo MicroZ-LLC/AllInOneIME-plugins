@@ -1,0 +1,42 @@
+# Checks every push and pull request: plugin schema, file names and sizes, https hosts, no eval / Function(,
+# that index.json lists exactly the plugins with their sha256, and that index.json.sig is a valid signature
+# of it. CI can't sign (the key never leaves the maintainer's keychain): after merging, the maintainer runs
+# scripts/build-index locally and pushes index.json and index.json.sig.
+name: check
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    # CryptoKit (Ed25519, SHA-256) comes with macOS; the script needs nothing else.
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Published versions never change
+        if: github.event_name == 'pull_request'
+        run: |
+          changed=$(git diff --name-only --diff-filter=MDRT "origin/${{ github.base_ref }}...HEAD" -- plugins/)
+          if [ -n "$changed" ]; then
+            echo "A published version folder can't change; add a new version folder instead:"
+            echo "$changed"
+            exit 1
+          fi
+
+      - name: Validate plugins
+        # A pull request adds or changes plugins without re-signing (only the maintainer can), so the
+        # index is checked on main only; here every plugin is validated.
+        if: github.event_name == 'pull_request'
+        run: swift scripts/build-index --validate
+
+      - name: Validate plugins, index and signature
+        if: github.event_name == 'push'
+        run: swift scripts/build-index --check
