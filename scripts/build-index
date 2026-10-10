@@ -1,0 +1,245 @@
+#!/usr/bin/env swift
+// Builds and signs the plugin index.
+//
+//   scripts/build-index           validate every plugin, write index.json, sign it into index.json.sig
+//                                 (the maintainer, locally: the signing key is in the login keychain)
+//   scripts/build-index --validate  only validate every plugin (a pull request, before it's signed)
+//   scripts/build-index --check   validate every plugin, and check that index.json lists exactly them and
+//                                 that index.json.sig is a valid signature of it (CI; needs no secret)
+//
+// The app downloads index.json and index.json.sig, verifies the signature with the public key built
+// into it BEFORE reading the index, then installs a plugin only if every file matches its sha256 here.
+// The hashes alone would not be enough: whoever can push to this repo could change files and hashes
+// together. The signature is what ties the index to the maintainer.
+
+import CryptoKit
+import Foundation
+
+/// The public half of the signing key; the app carries the same one (PluginLibrary.publicKey).
+let publicKeyBase64 = "UPEZUcV35+GKMGKuBUm+EG2M8jro4F23vyskaCLcBIE="
+/// Where the private half lives: `security find-generic-password -s … -a … -w`. Never in a file.
+let keychainService = "allinoneime-plugins-signing"
+let keychainAccount = "weijianz-opc"
+
+let schema = 1
+let supportedTypes: Set<String> = ["script", "prompt", "link"]
+let maxScriptBytes = 64 * 1024
+let maxFileBytes = 1 << 20
+/// Code that builds code from text: refused, so what was reviewed is what runs.
+let forbidden: [(pattern: String, label: String)] = [
+    (#"\beval\s*\("#, "eval("),
+    (#"\bFunction\s*\("#, "Function("),
+    (#"\bnew\s+Function\b"#, "new Function"),
+]
+
+let root = URL(fileURLWithPath: CommandLine.arguments[0]).deletingLastPathComponent().deletingLastPathComponent()
+let checkOnly = CommandLine.arguments.dropFirst().contains("--check")
+let validateOnly = CommandLine.arguments.dropFirst().contains("--validate")
+let fm = FileManager.default
+var problems: [String] = []
+
+func problem(_ text: String) { problems.append(text) }
+
+func sha256(_ data: Data) -> String { SHA256.hash(data: data).map { String(format: "%02x", $0) }.joined() }
+
+func matches(_ text: String, _ pattern: String) -> Bool {
+    text.range(of: pattern, options: .regularExpression) != nil
+}
+
+/// "1.2.10" → [1, 2, 10], for sorting versions.
+func versionParts(_ v: String) -> [Int] { v.split(separator: ".").map { Int($0) ?? 0 } }
+
+func newer(_ a: String, _ b: String) -> Bool {
+    let x = versionParts(a), y = versionParts(b)
+    for i in 0..<max(x.count, y.count) {
+        let l = i < x.count ? x[i] : 0, r = i < y.count ? y[i] : 0
+        if l != r { return l > r }
+    }
+    return false
+}
+
+func isHost(_ s: String) -> Bool { matches(s, #"^[a-z0-9]([a-z0-9-]*[a-z0-9])?(\.[a-z0-9]([a-z0-9-]*[a-z0-9])?)+$"#) }
+
+func folders(_ url: URL) -> [String] {
+    ((try? fm.contentsOfDirectory(atPath: url.path)) ?? []).filter { !$0.hasPrefix(".") }.sorted()
+}
+
+/// One version folder: validated, and its index entry (nil when it has problems).
+func entry(name: String, version: String) -> [String: Any]? {
+    let dir = root.appendingPathComponent("plugins/\(name)/\(version)", isDirectory: true)
+    let at = "plugins/\(name)/\(version)"
+    let before = problems.count
+    if !matches(name, "^[a-z]{1,24}$") { problem("\(at): the folder name must be 1-24 lowercase letters") }
+    if !matches(version, #"^\d+(\.\d+){0,2}$"#) { problem("\(at): the version folder must be like 1.0.0") }
+
+    // Files: plain files only, directly in the folder.
+    var files: [String: String] = [:]
+    var contents: [String: Data] = [:]
+    for file in ((try? fm.contentsOfDirectory(atPath: dir.path)) ?? []).sorted() {
+        let url = dir.appendingPathComponent(file)
+        let values = try? url.resourceValues(forKeys: [.isRegularFileKey, .isSymbolicLinkKey])
+        guard values?.isRegularFile == true, values?.isSymbolicLink != true else {
+            problem("\(at)/\(file): only plain files (no folders or links)")
+            continue
+        }
+        if file == ".DS_Store" { continue }
+        guard matches(file, #"^[A-Za-z0-9_-][A-Za-z0-9._-]{0,63}$"#), file != "install.json" else {
+            problem("\(at)/\(file): file names are letters, digits, . _ - (not install.json)")
+            continue
+        }
+        guard let data = try? Data(contentsOf: url), data.count <= maxFileBytes else {
+            problem("\(at)/\(file): unreadable or larger than 1 MB")
+            continue
+        }
+        files[file] = sha256(data)
+        contents[file] = data
+    }
+
+    guard let data = contents["plugin.json"],
+          let manifest = (try? JSONSerialization.jsonObject(with: data)) as? [String: Any] else {
+        problem("\(at): no readable plugin.json")
+        return nil
+    }
+    func string(_ key: String) -> String? { manifest[key] as? String }
+    if string("name") != name { problem("\(at): plugin.json name must be \"\(name)\" (the folder)") }
+    if string("version") != version { problem("\(at): plugin.json version must be \"\(version)\" (the folder)") }
+    let api = manifest["api"] as? Int ?? 1
+    if api < 1 { problem("\(at): api must be 1 or more") }
+    if let min = manifest["minAppVersion"], !((min as? String).map { matches($0, #"^\d+(\.\d+){0,2}$"#) } ?? false) {
+        problem("\(at): minAppVersion must be like 0.5.0")
+    }
+    let type = string("type") ?? ""
+    if !supportedTypes.contains(type) { problem("\(at): type must be one of \(supportedTypes.sorted())") }
+
+    let summary = manifest["summary"]
+    let summaryOK: Bool = {
+        if let s = summary as? String { return !s.isEmpty }
+        if let s = summary as? [String: Any], let en = s["en"] as? String, !en.isEmpty { return true }
+        return false
+    }()
+    if !summaryOK { problem("\(at): summary is required: \"…\" or {\"en\": \"…\", \"zh\": \"…\"}") }
+
+    let hosts = manifest["hosts"] as? [String] ?? []
+    if manifest["hosts"] != nil, manifest["hosts"] as? [String] == nil { problem("\(at): hosts must be a list of host names") }
+    for host in hosts where !isHost(host) { problem("\(at): \"\(host)\" is not a host name (no https://, path or port; lowercase)") }
+    if let homepage = string("homepage"), !homepage.hasPrefix("https://") { problem("\(at): homepage must be https://") }
+    if let color = string("color"), !matches(color, #"^([a-z]+|#[0-9A-Fa-f]{6})$"#) { problem("\(at): color is a name or #RRGGBB") }
+
+    switch type {
+    case "script":
+        guard let script = string("script"), let source = contents[script] else {
+            problem("\(at): script must name a file in the folder")
+            break
+        }
+        if source.count > maxScriptBytes { problem("\(at)/\(script): larger than 64 KB") }
+        if let timeout = manifest["timeoutSeconds"] as? Double, timeout > 20 { problem("\(at): timeoutSeconds is at most 20") }
+    case "prompt":
+        if (string("prompt") ?? "").trimmingCharacters(in: .whitespacesAndNewlines).isEmpty { problem("\(at): prompt is empty") }
+    case "link":
+        guard let link = string("url"), link.hasPrefix("https://"), let host = URL(string: link)?.host else {
+            problem("\(at): url must be an https:// address")
+            break
+        }
+        if !hosts.isEmpty, !hosts.contains(host.lowercased()) { problem("\(at): url's host must be in hosts") }
+    default:
+        break
+    }
+
+    // No code from text, in any script.
+    for (file, data) in contents where file.hasSuffix(".js") {
+        let text = String(decoding: data, as: UTF8.self)
+        for rule in forbidden where matches(text, rule.pattern) { problem("\(at)/\(file): \(rule.label) is not allowed") }
+    }
+
+    guard problems.count == before else { return nil }
+    var entry: [String: Any] = [
+        "name": name, "version": version, "api": api, "type": type, "hosts": hosts,
+        "base": "plugins/\(name)/\(version)/", "files": files,
+    ]
+    for key in ["minAppVersion", "summary", "author", "homepage", "icon", "color", "url"] {
+        if let value = manifest[key] { entry[key] = value }
+    }
+    return entry
+}
+
+// Every plugin, every version (newest first): the app installs the newest one it can run.
+var entries: [[String: Any]] = []
+for name in folders(root.appendingPathComponent("plugins")) {
+    let versions = folders(root.appendingPathComponent("plugins/\(name)")).sorted(by: newer)
+    if versions.isEmpty { problem("plugins/\(name): no version folder") }
+    for version in versions {
+        if let e = entry(name: name, version: version) { entries.append(e) }
+    }
+}
+
+guard problems.isEmpty else {
+    for p in problems { FileHandle.standardError.write(Data("✗ \(p)\n".utf8)) }
+    exit(1)
+}
+if validateOnly {
+    print("✓ \(entries.count) plugin version(s) valid")
+    exit(0)
+}
+
+func json(_ object: Any) -> Data {
+    // Sorted keys: the same plugins always give the same bytes (apart from `generated`).
+    var data = try! JSONSerialization.data(withJSONObject: object, options: [.prettyPrinted, .sortedKeys, .withoutEscapingSlashes])
+    data.append(0x0A)
+    return data
+}
+
+let indexURL = root.appendingPathComponent("index.json")
+let sigURL = root.appendingPathComponent("index.json.sig")
+let publicKey = try! Curve25519.Signing.PublicKey(rawRepresentation: Data(base64Encoded: publicKeyBase64)!)
+
+if checkOnly {
+    guard let data = try? Data(contentsOf: indexURL),
+          let index = (try? JSONSerialization.jsonObject(with: data)) as? [String: Any] else {
+        print("✗ index.json is missing or unreadable"); exit(1)
+    }
+    var ok = true
+    if index["schema"] as? Int != schema { print("✗ index.json: schema must be \(schema)"); ok = false }
+    if json(index["plugins"] ?? []) != json(entries) {
+        print("✗ index.json doesn't match the plugins folder: run scripts/build-index and commit index.json and index.json.sig")
+        ok = false
+    }
+    let signature = (try? String(contentsOf: sigURL, encoding: .utf8)).flatMap {
+        Data(base64Encoded: $0.trimmingCharacters(in: .whitespacesAndNewlines))
+    }
+    if signature.map({ !publicKey.isValidSignature($0, for: data) }) ?? true {
+        print("✗ index.json.sig is missing or not a valid signature of index.json (the maintainer signs with scripts/build-index)")
+        ok = false
+    }
+    guard ok else { exit(1) }
+    print("✓ \(entries.count) plugin version(s); index.json matches and is signed")
+    exit(0)
+}
+
+// Sign: the private key comes from the login keychain (macOS may ask to allow access).
+let security = Process()
+security.executableURL = URL(fileURLWithPath: "/usr/bin/security")
+security.arguments = ["find-generic-password", "-s", keychainService, "-a", keychainAccount, "-w"]
+let pipe = Pipe()
+security.standardOutput = pipe
+try! security.run()
+let secret = pipe.fileHandleForReading.readDataToEndOfFile()
+security.waitUntilExit()
+guard security.terminationStatus == 0,
+      let raw = Data(base64Encoded: String(decoding: secret, as: UTF8.self).trimmingCharacters(in: .whitespacesAndNewlines)),
+      let privateKey = try? Curve25519.Signing.PrivateKey(rawRepresentation: raw) else {
+    print("✗ no signing key in the keychain (service \(keychainService), account \(keychainAccount))")
+    exit(1)
+}
+guard privateKey.publicKey.rawRepresentation == publicKey.rawRepresentation else {
+    print("✗ the keychain's signing key doesn't match the public key in this script and the app")
+    exit(1)
+}
+
+let formatter = ISO8601DateFormatter()
+let index: [String: Any] = ["schema": schema, "generated": formatter.string(from: Date()), "plugins": entries]
+let data = json(index)
+let signature = try! privateKey.signature(for: data)
+precondition(publicKey.isValidSignature(signature, for: data))
+try! data.write(to: indexURL)
+try! Data((signature.base64EncodedString() + "\n").utf8).write(to: sigURL)
+print("✓ index.json: \(entries.count) plugin version(s), signed into index.json.sig")
