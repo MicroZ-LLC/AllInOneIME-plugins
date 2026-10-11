@@ -1,6 +1,28 @@
 {
-  "generated" : "2026-10-10T22:29:01Z",
+  "generated" : "2026-10-11T08:06:29Z",
   "plugins" : [
+    {
+      "api" : 1,
+      "author" : "weijianz-opc",
+      "base" : "plugins/bsky/1.0.0/",
+      "color" : "#1185FE",
+      "files" : {
+        "plugin.json" : "efd90f1173335a2bc575d9099c981d51dedba491f5884a52efc924288abaffa2"
+      },
+      "hosts" : [
+
+      ],
+      "icon" : "cloud.fill",
+      "minAppVersion" : "0.5.0",
+      "name" : "bsky",
+      "summary" : {
+        "en" : "Post to Bluesky: opens the composer with your text",
+        "zh" : "发到 Bluesky：打开发帖框，文字已填好"
+      },
+      "type" : "link",
+      "url" : "https://bsky.app/intent/compose?text={input}",
+      "version" : "1.0.0"
+    },
     {
       "api" : 1,
       "author" : "weijianz-opc",
@@ -20,6 +42,96 @@
       "summary" : {
         "en" : "Stock quotes: @stock AAPL 600519 700",
         "zh" : "股票行情：@stock AAPL 600519 700"
+      },
+      "type" : "script",
+      "version" : "1.0.0"
+    },
+    {
+      "api" : 1,
+      "author" : "weijianz-opc",
+      "base" : "plugins/threads/1.0.0/",
+      "color" : "#000000",
+      "files" : {
+        "plugin.json" : "7a78729d81bced43d8eed15f658054cb9904b3d784e2dd80bbef3b6a8e31cbb2"
+      },
+      "hosts" : [
+
+      ],
+      "icon" : "at",
+      "minAppVersion" : "0.5.0",
+      "name" : "threads",
+      "summary" : {
+        "en" : "Post to Threads: opens the composer with your text",
+        "zh" : "发到 Threads：打开发帖框，文字已填好"
+      },
+      "type" : "link",
+      "url" : "https://www.threads.net/intent/post?text={input}",
+      "version" : "1.0.0"
+    },
+    {
+      "api" : 1,
+      "author" : "weijianz-opc",
+      "base" : "plugins/weibo/1.0.0/",
+      "color" : "#E6162D",
+      "files" : {
+        "plugin.json" : "c2534c2e783b3f4c8a74fadc1966d30d3d566ee7305c4bb6996e244da34bfc9a"
+      },
+      "hosts" : [
+
+      ],
+      "icon" : "eye.fill",
+      "minAppVersion" : "0.5.0",
+      "name" : "weibo",
+      "summary" : {
+        "en" : "Post to Weibo: opens the share page with your text",
+        "zh" : "发微博：打开分享页，文字已填好"
+      },
+      "type" : "link",
+      "url" : "https://service.weibo.com/share/share.php?title={input}",
+      "version" : "1.0.0"
+    },
+    {
+      "api" : 1,
+      "author" : "weijianz-opc",
+      "base" : "plugins/x/1.0.0/",
+      "color" : "#000000",
+      "files" : {
+        "plugin.json" : "193c84bb5f49391fff799c60134cc4e9b877d77ed8363ae523e74618a59657e4"
+      },
+      "hosts" : [
+
+      ],
+      "icon" : "bird",
+      "minAppVersion" : "0.5.0",
+      "name" : "x",
+      "summary" : {
+        "en" : "Post to X: opens the composer with your text",
+        "zh" : "发到 X：打开发帖框，文字已填好"
+      },
+      "type" : "link",
+      "url" : "https://x.com/intent/post?text={input}",
+      "version" : "1.0.0"
+    },
+    {
+      "api" : 1,
+      "author" : "weijianz-opc",
+      "base" : "plugins/xe/1.0.0/",
+      "color" : "green",
+      "files" : {
+        "main.js" : "c67daafea1a7d5298c3f9539578eb20d8783d8346935e3d08afedc0ddb9c842f",
+        "plugin.json" : "8309b218061eeb9fce1a2c828722aae351243155c367e8690c2a0085c1a41a16"
+      },
+      "homepage" : "https://github.com/weijianz-opc/AllInOneIME-plugins",
+      "hosts" : [
+        "open.er-api.com",
+        "api.frankfurter.dev"
+      ],
+      "icon" : "dollarsign.arrow.circlepath",
+      "minAppVersion" : "0.5.0",
+      "name" : "xe",
+      "summary" : {
+        "en" : "Currency: @xe 100 USD CNY (rates by ExchangeRate-API)",
+        "zh" : "汇率换算：@xe 100 USD CNY（汇率来自 ExchangeRate-API）"
       },
       "type" : "script",
       "version" : "1.0.0"

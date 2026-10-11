@@ -136,3 +136,7 @@ scripts/build-index --validate # pull request 的 CI：只检查插件
 私钥存在维护者的登录钥匙串里（通用密码，服务 `allinoneime-plugins-signing`，账户 `weijianz-opc`，内容是原始私钥的 base64）；
 脚本用 `security find-generic-password` 读取，和上面的公钥不匹配时拒绝签名。不要把私钥放进任何仓库的文件里。
 `index.json` 和 `index.json.sig` 要一起提交。
+
+---
+
+Copyright © 2026 [Weijian Zhang](https://weijianz.com). GPL-3.0; see [LICENSE](LICENSE). Each plugin may name its own author in its `plugin.json`.
