@@ -4,7 +4,7 @@
 
 ## English
 
-The plugin library of [AllInOneIME](https://github.com/weijianz-opc/AllInOneIME), the macOS input method
+The plugin library of [AllInOneIME](https://github.com/MicroZ-LLC/AllInOneIME), the macOS input method
 where `@command text` runs commands. Plugins add commands not everyone needs, like `@stock AAPL 600519 700`.
 In AllInOneIME, Settings → Plugins → "Browse Library" lists the plugins here; installing one shows the
 websites it contacts, downloads its files and checks each against the signed index.
@@ -46,7 +46,7 @@ UPEZUcV35+GKMGKuBUm+EG2M8jro4F23vyskaCLcBIE=
 
 ### Submitting a plugin
 
-1. Write it (see [docs/plugins.md](https://github.com/weijianz-opc/AllInOneIME/blob/main/docs/plugins.md)) and
+1. Write it (see [docs/plugins.md](https://github.com/MicroZ-LLC/AllInOneIME/blob/main/docs/plugins.md)) and
    try it in `~/.config/allinoneime/plugins/<name>/`, where AllInOneIME loads it as a local plugin.
 2. Open a pull request adding `plugins/<name>/<version>/` with `plugin.json` and its files. Don't touch
    `index.json` or `index.json.sig`: the maintainer regenerates and signs them after merging.
@@ -79,7 +79,7 @@ file in any repository. Commit `index.json` and `index.json.sig` together.
 
 ## 中文
 
-[AllInOneIME](https://github.com/weijianz-opc/AllInOneIME)（macOS 输入法，`@命令 内容` 运行命令）的插件库。
+[AllInOneIME](https://github.com/MicroZ-LLC/AllInOneIME)（macOS 输入法，`@命令 内容` 运行命令）的插件库。
 插件是不是人人都要的 `@` 命令，比如 `@stock AAPL 600519 700` 查股价。
 在 AllInOneIME 的设置 →「插件」→「浏览插件库」里能看到这里的插件；安装时会先告诉你它会访问哪些网站，
 再下载文件，并逐个和签过名的索引核对。
@@ -109,7 +109,7 @@ UPEZUcV35+GKMGKuBUm+EG2M8jro4F23vyskaCLcBIE=
 
 ### 提交插件
 
-1. 按 [docs/plugins.md](https://github.com/weijianz-opc/AllInOneIME/blob/main/docs/plugins.md) 写好，放进
+1. 按 [docs/plugins.md](https://github.com/MicroZ-LLC/AllInOneIME/blob/main/docs/plugins.md) 写好，放进
    `~/.config/allinoneime/plugins/<名字>/` 试用（AllInOneIME 会把它当作本地插件加载）。
 2. 提一个 pull request，新增 `plugins/<名字>/<版本>/`（`plugin.json` 和它的文件）。不要改 `index.json`
    和 `index.json.sig`：合并后由维护者重新生成并签名。
@@ -139,4 +139,4 @@ scripts/build-index --validate # pull request 的 CI：只检查插件
 
 ---
 
-Copyright © 2026 [Weijian Zhang](https://weijianz.com). GPL-3.0; see [LICENSE](LICENSE). Each plugin may name its own author in its `plugin.json`.
+Copyright © 2026 MicroZ LLC. GPL-3.0; see [LICENSE](LICENSE). Each plugin may name its own author in its `plugin.json`.
