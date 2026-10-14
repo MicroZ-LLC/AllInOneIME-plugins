@@ -139,4 +139,4 @@ scripts/build-index --validate # pull request 的 CI：只检查插件
 
 ---
 
-Copyright © 2026 MicroZ LLC. GPL-3.0; see [LICENSE](LICENSE). Each plugin may name its own author in its `plugin.json`.
+Copyright © 2026 MicroZ LLC. MIT; see [LICENSE](LICENSE). Each plugin may name its own author in its `plugin.json`.
