@@ -1,0 +1,19 @@
+{
+  "name": "calendar",
+  "version": "1.0.0",
+  "api": 1,
+  "minAppVersion": "0.5.0",
+  "type": "script",
+  "summary": {
+    "en": "Dates: @calendar +10 → Tue, Oct 27 · in 10 days; @calendar 12/25 - today → 69 days",
+    "zh": "日期：@calendar +10 → 周二 10月27日 · 10天后；@calendar 12/25-today → 69天"
+  },
+  "script": "main.js",
+  "hosts": [],
+  "timeoutSeconds": 3,
+  "ascii": true,
+  "author": "MicroZ LLC",
+  "homepage": "https://github.com/MicroZ-LLC/AllInOneIME-plugins",
+  "icon": "calendar",
+  "color": "orange"
+}
