@@ -1,5 +1,5 @@
 {
-  "generated" : "2026-10-11T08:06:29Z",
+  "generated" : "2026-10-19T04:20:33Z",
   "plugins" : [
     {
       "api" : 1,
@@ -21,6 +21,52 @@
       },
       "type" : "link",
       "url" : "https://bsky.app/intent/compose?text={input}",
+      "version" : "1.0.0"
+    },
+    {
+      "api" : 1,
+      "author" : "MicroZ LLC",
+      "base" : "plugins/calculator/1.0.0/",
+      "color" : "gray",
+      "files" : {
+        "main.js" : "e1b8855c3a7f648a51b2c0fe933fed285299fb4cf945d73d105a5bf513749313",
+        "plugin.json" : "e74e4a8b54b9330ae1c853be4445d63ae4ee14c6e01e6f5a6142020373bb73f6"
+      },
+      "homepage" : "https://github.com/MicroZ-LLC/AllInOneIME-plugins",
+      "hosts" : [
+
+      ],
+      "icon" : "plus.forwardslash.minus",
+      "minAppVersion" : "0.5.0",
+      "name" : "calculator",
+      "summary" : {
+        "en" : "Calculator, offline: @calculator 23*17 → 391; 0.1+0.2 → 0.3; 100+10% → 110; sqrt(2)",
+        "zh" : "计算器，本机离线：@calculator 23*17 → 391；0.1+0.2 → 0.3；100+10% → 110；sqrt(2)"
+      },
+      "type" : "script",
+      "version" : "1.0.0"
+    },
+    {
+      "api" : 1,
+      "author" : "MicroZ LLC",
+      "base" : "plugins/calendar/1.0.0/",
+      "color" : "orange",
+      "files" : {
+        "main.js" : "6844fbfd410c71542c4a22199b7e8bfb6db445a68731f88f0d2f0b12721a350d",
+        "plugin.json" : "80019fb4cc483b3c61c1e6f32c412489a583aadae1b5683beae0af8640ecded2"
+      },
+      "homepage" : "https://github.com/MicroZ-LLC/AllInOneIME-plugins",
+      "hosts" : [
+
+      ],
+      "icon" : "calendar",
+      "minAppVersion" : "0.5.0",
+      "name" : "calendar",
+      "summary" : {
+        "en" : "Dates: @calendar +10 → Tue, Oct 27 · in 10 days; @calendar 12/25 - today → 69 days",
+        "zh" : "日期：@calendar +10 → 周二 10月27日 · 10天后；@calendar 12/25-today → 69天"
+      },
+      "type" : "script",
       "version" : "1.0.0"
     },
     {
