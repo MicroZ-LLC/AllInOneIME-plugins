@@ -1,5 +1,5 @@
 {
-  "generated" : "2026-10-23T18:55:43Z",
+  "generated" : "2026-10-23T23:43:52Z",
   "plugins" : [
     {
       "api" : 1,
@@ -68,6 +68,29 @@
       },
       "type" : "script",
       "version" : "1.0.0"
+    },
+    {
+      "api" : 1,
+      "author" : "MicroZ LLC",
+      "base" : "plugins/github/1.0.2/",
+      "color" : "gray",
+      "files" : {
+        "main.js" : "f04e5ea8f0eb23969e85ff433f3946fcf72f253d1b1a695133f538a1e863b942",
+        "plugin.json" : "d3cb9d9db37a2f01a97ffd38b39e4710e31f7df2e923b914b7bdc6f3bca25f37"
+      },
+      "homepage" : "https://github.com/MicroZ-LLC/AllInOneIME-plugins",
+      "hosts" : [
+        "api.github.com"
+      ],
+      "icon" : "number",
+      "minAppVersion" : "0.6.7",
+      "name" : "github",
+      "summary" : {
+        "en" : "GitHub issues as you type: #12 → #1234 Fix login; @github login to search",
+        "zh" : "边打边补 GitHub issue：#12 → #1234 修登录；@github 登录 搜索"
+      },
+      "type" : "script",
+      "version" : "1.0.2"
     },
     {
       "api" : 1,
