@@ -1,0 +1,19 @@
+{
+  "name": "days",
+  "version": "1.0.1",
+  "api": 1,
+  "minAppVersion": "0.5.0",
+  "type": "script",
+  "summary": {
+    "en": "Date math, like a calendar: @days +10, @days next fri, @days 12/25 - today (days until then)",
+    "zh": "日期计算（日历）：@days +10、@days 下周五、@days 12/25-today（还有几天）"
+  },
+  "script": "main.js",
+  "hosts": [],
+  "timeoutSeconds": 3,
+  "ascii": true,
+  "author": "MicroZ LLC",
+  "homepage": "https://github.com/MicroZ-LLC/AllInOneIME-plugins",
+  "icon": "calendar",
+  "color": "orange"
+}
