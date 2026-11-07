@@ -46,17 +46,19 @@ const END = /\s*$/y;
 const CN_DIGITS = { 零: 0, 〇: 0, 一: 1, 二: 2, 两: 2, 三: 3, 四: 4, 五: 5, 六: 6, 七: 7, 八: 8, 九: 9 };
 const CN_UNITS = { 十: 10, 百: 100, 千: 1000 };
 // Chinese numbers before a unit or 月 / 日 / 号 (三天后, 两周后, 十一月三日, 二〇二六年), not a weekday (周三, 星期一).
-const CN_NUMBER = /(?<![周期拜])([零〇一二两三四五六七八九十百千]+)(?=\s*个?\s*(?:天|日|号|周|星期|礼拜|月|年))/g;
+// The unit is an optional group, not a lookahead, so a long run of numerals is read once (no backtracking).
+const CN_NUMBER = /(?<![周期拜])([零〇一二两三四五六七八九十百千万]+)(\s*个?\s*(?:天|日|号|周|星期|礼拜|月|年))?/g;
 
-/** 三 → 3, 十一 → 11, 两百 → 200, 二〇二六 → 2026 (digits alone are read one by one). */
+/** 三 → 3, 十一 → 11, 两百 → 200, 一万 → 10000, 二〇二六 → 2026 (digits alone are read one by one). */
 function cnNumber(s) {
-  if (!/[十百千]/.test(s)) return +[...s].map(c => CN_DIGITS[c]).join("");
-  let total = 0, n = 0;
+  if (!/[十百千万]/.test(s)) return +[...s].map(c => CN_DIGITS[c]).join("");
+  let total = 0, section = 0, n = 0;
   for (const c of s) {
     if (c in CN_DIGITS) n = CN_DIGITS[c];
-    else { total += (n || 1) * CN_UNITS[c]; n = 0; }
+    else if (c === "万") { total += (section + n || 1) * 10000; section = 0; n = 0; }
+    else { section += (n || 1) * CN_UNITS[c]; n = 0; }
   }
-  return total + n;
+  return total + section + n;
 }
 
 // A day is a number, counted from 1970-01-01 with UTC dates: every UTC day is 24 hours long, so a
@@ -120,7 +122,8 @@ function dateFor(input, now, lang) {
   const today = dayOf(now.getFullYear(), now.getMonth() + 1, now.getDate());
   const year = partsOf(today).y, month = partsOf(today).m;
   const text = String(input == null ? "" : input).normalize("NFKC")
-    .replace(/[−–—]/g, "-").replace(/[\s=?]+$/, "").trim().replace(CN_NUMBER, cnNumber);
+    .replace(/[−–—]/g, "-").replace(/[\s=?]+$/, "").trim()
+    .replace(CN_NUMBER, (all, number, unit) => unit ? cnNumber(number) + unit : all);
   const bare = /^\d+$/.test(text);  // "10" alone is in 10 days
   let pos = 0;
   let yearlessAt = -1;  // where the last date without a year was read

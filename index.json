@@ -1,5 +1,5 @@
 {
-  "generated" : "2026-11-07T00:19:08Z",
+  "generated" : "2026-11-07T00:24:16Z",
   "plugins" : [
     {
       "api" : 1,
@@ -52,7 +52,7 @@
       "base" : "plugins/days/1.0.1/",
       "color" : "orange",
       "files" : {
-        "main.js" : "2e06cae7f019d223cd697466672888f670212a89c24a6555acd9f4145686c284",
+        "main.js" : "bc0b3a6233ec0c080ae7b0e22f5ccba3da240c6831eb4150969200b818bc5238",
         "plugin.json" : "4d7182b37ed8d896987f9be9a5d6e57fcd7f67ffe427858d7e719cee1ca66b6e"
       },
       "homepage" : "https://github.com/MicroZ-LLC/AllInOneIME-plugins",
