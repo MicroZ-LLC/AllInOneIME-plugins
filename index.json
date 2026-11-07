@@ -1,5 +1,5 @@
 {
-  "generated" : "2026-11-07T00:02:39Z",
+  "generated" : "2026-11-07T00:19:08Z",
   "plugins" : [
     {
       "api" : 1,
@@ -45,6 +45,29 @@
       },
       "type" : "script",
       "version" : "1.0.0"
+    },
+    {
+      "api" : 1,
+      "author" : "MicroZ LLC",
+      "base" : "plugins/days/1.0.1/",
+      "color" : "orange",
+      "files" : {
+        "main.js" : "2e06cae7f019d223cd697466672888f670212a89c24a6555acd9f4145686c284",
+        "plugin.json" : "4d7182b37ed8d896987f9be9a5d6e57fcd7f67ffe427858d7e719cee1ca66b6e"
+      },
+      "homepage" : "https://github.com/MicroZ-LLC/AllInOneIME-plugins",
+      "hosts" : [
+
+      ],
+      "icon" : "calendar",
+      "minAppVersion" : "0.5.0",
+      "name" : "days",
+      "summary" : {
+        "en" : "Date math, like a calendar: @days +10, @days next fri, @days 12/25 - today (days until then)",
+        "zh" : "日期计算（日历）：@days +10、@days 下周五、@days 12/25-today（还有几天）"
+      },
+      "type" : "script",
+      "version" : "1.0.1"
     },
     {
       "api" : 1,
