@@ -1,14 +1,14 @@
-// @calendar: dates, worked out on the Mac, on one line (in Chinese or English: like the input, else the input method, else the system).
-//   @calendar +10              周二 10月27日 · 10天后 / Tue, Oct 27 · in 10 days
-//   @calendar 明天 / tomorrow   also 后天, 大后天, 昨天, 前天, yesterday
-//   @calendar 3天前 / -3        also 10, 10d, 10 days, 10天后, 3 days ago
-//   @calendar 2w 1个月 1y       weeks, calendar months and years (Jan 31 + 1m = Feb 28)
-//   @calendar fri / 周五        the next Friday, today if it is one
-//   @calendar next fri / 下周五  Friday of next week; this fri / 本周五, last fri / 上周五 (weeks start on Monday)
-//   @calendar 11/3 / 11月3日    that day this year; also nov 3, 3 nov, 2026-11-3, 2026年11月3日, 3号
-//   @calendar 11/3+30           a day, then + or - an offset: fri+1w, 明天+3
-//   @calendar 12/25 - today     69天（周五 12月25日） / 69 days (Fri, Dec 25)
-//   @calendar today to 12/25    the same: B − A for to / 到 / 至 (and from A to B), A − B for -
+// @days: dates, worked out on the Mac, on one line (in Chinese or English: like the input, else the input method, else the system).
+//   @days +10                  周二 10月27日 · 10天后 / Tue, Oct 27 · in 10 days
+//   @days 明天 / tomorrow       also 后天, 大后天, 昨天, 前天, yesterday
+//   @days 3天前 / -3            also 10, 10d, 10 days, 10天后, 3 days ago
+//   @days 2w 1个月 1y           weeks, calendar months and years (Jan 31 + 1m = Feb 28)
+//   @days fri / 周五            the next Friday, today if it is one
+//   @days next fri / 下周五      Friday of next week; this fri / 本周五, last fri / 上周五 (weeks start on Monday)
+//   @days 11/3 / 11月3日        that day this year; also nov 3, 3 nov, 2026-11-3, 2026年11月3日, 3号
+//   @days 11/3+30               a day, then + or - an offset: fri+1w, 明天+3
+//   @days 12/25 - today         69天（周五 12月25日） / 69 days (Fri, Dec 25)
+//   @days today to 12/25        the same: B − A for to / 到 / 至 (and from A to B), A − B for -
 // Whole days in local time: no clock times or time zones, and nothing leaves the Mac.
 
 const WEEKDAYS_ZH = ["周日", "周一", "周二", "周三", "周四", "周五", "周六"];
